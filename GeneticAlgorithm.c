@@ -64,10 +64,11 @@ int compare(const void *a, const void *b) {
 }
 
 double fitness(arrangement *a) {
+        if (a->walls == NULL) return 0.0;
 	point *corns = corners(a);
 	point *paint = paintings(a, corns);
 	if (paint == NULL) {
-		puts("PAINT IS NULL");
+		//puts("PAINT IS NULL");
 		return 0.0;
 	}
 	graph_wrapper G = graph_of_arrangement(a, paint, corns);
@@ -423,10 +424,17 @@ arrangement** generate(arrangement **previous, int length, float mutationRate, i
 	double *fitnesses = malloc(length*sizeof(double));
 	arrangement **out = malloc(length*sizeof(arrangement*));
 	int i;
+        int nonzero = 0;
 	//#pragma omp parallel for
 	for(i = 0; i < length; i++) {
+            if (previous[i] == NULL) {
+                printf("NULL PREV %d\n", i);
+            }
+            if (fitness(previous[i]) > 0.0) nonzero++;
 		fitnesses[i] = 50.0 - fitness(previous[i]);
 	}
+
+        printf("nonzero: %d\n", nonzero);
 
         pear *af =
             malloc(length*sizeof(pear));
